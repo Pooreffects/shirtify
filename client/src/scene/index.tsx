@@ -4,21 +4,27 @@ import { Environment, Center } from '@react-three/drei';
 import Shirt from './Shirt';
 import Backdrop from './Backdrop';
 import CameraRig from './CameraRig';
+import { Suspense } from 'react';
 
 interface ISceneProps {}
 
 const Scene: React.FC<ISceneProps> = () => {
   return (
-    <Canvas>
-      <ambientLight />
+    <Canvas
+      shadows
+      camera={{ position: [0, 0, 0], fov: 30 }}
+      gl={{ preserveDrawingBuffer: true }}
+      className='w-full max-w-full h-full transition-all ease-in'
+    >
+      <ambientLight intensity={0.5} />
       <Environment preset='city' />
 
-      {/* <CameraRig>
-        <Backdrop/> */}
+      <CameraRig>
+        <Backdrop />
         <Center>
-          <Shirt/>
+          <Shirt />
         </Center>
-      {/* </CameraRig> */}
+      </CameraRig>
     </Canvas>
   );
 };
