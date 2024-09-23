@@ -1,4 +1,4 @@
-import { swatch, fileIcon, ai, logoShirt, stylishShirt } from '@assets';
+import { swatch, fileIcon, ai, logoShirt, stylishShirt } from '../assets/';
 
 // Define types for EditorTab and FilterTab
 interface EditorTab {

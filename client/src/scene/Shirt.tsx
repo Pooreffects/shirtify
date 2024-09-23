@@ -1,0 +1,28 @@
+import { easing } from 'maath';
+import { useFrame } from '@react-three/fiber';
+import { Decal, useGLTF, useTexture } from '@react-three/drei';
+
+import { useSnapshot } from 'valtio';
+import state from '../store';
+
+const Shirt = () => {
+  const snap = useSnapshot(state);
+  const { nodes, materials } = useGLTF('/hoodie.glb');
+
+  const logoTexture = useTexture(snap.logoDecal);
+  const fullTexture = useTexture(snap.fullDecal);
+
+  return (
+    <group>
+      <mesh
+        castShadow
+        geometry={nodes.defaultMaterial.geometry}
+        material={materials.Hoodie}
+        material-roughness={1}
+        dispose={null}
+      ></mesh>
+    </group>
+  );
+};
+
+export default Shirt;
