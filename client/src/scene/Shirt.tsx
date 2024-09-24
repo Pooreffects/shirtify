@@ -1,48 +1,39 @@
-import { useEffect } from 'react';
+import { useMemo } from 'react';
 import { useGLTF, Decal, useTexture } from '@react-three/drei';
 import { easing } from 'maath';
 import { useSnapshot } from 'valtio';
 import state from '../store';
-import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
 
 const Shirt = () => {
   const snap = useSnapshot(state);
-  const { nodes, materials } = useGLTF(
-    '/hoodie.glb',
-    'https://www.gstatic.com/draco/v1/decoders/'
+  const { nodes, materials } = useGLTF('/drape.glb');
+
+  // Memoized node and material references
+  const objectNode = useMemo(() => nodes.Object_39, [nodes]);
+  const hoodieMaterial = useMemo(
+    () => materials.Hoodie as THREE.MeshStandardMaterial,
+    [materials]
   );
 
-  useEffect(() => {
-    const hoodieMaterial = materials.Hoodie as THREE.MeshStandardMaterial;
-
-    if (hoodieMaterial) {
-      // Remove all texture maps
-      hoodieMaterial.map = null;
-      hoodieMaterial.alphaMap = null;
-      hoodieMaterial.emissiveMap = null;
-      hoodieMaterial.metalness = 0;
-      hoodieMaterial.roughness = 1;
-      hoodieMaterial.needsUpdate = true;
-    }
-  }, [materials]);
-
+  // Load textures for decals
   const logoTexture = useTexture(snap.logoDecal);
   const fullTexture = useTexture(snap.fullDecal);
 
-  useFrame((state, delta) => {
-    const hoodieMaterial = materials.Hoodie as THREE.MeshStandardMaterial;
+  // Animate material color changes based on state
+  useFrame((_, delta) => {
     if (hoodieMaterial) {
       easing.dampC(hoodieMaterial.color, snap.color, 0.25, delta);
     }
   });
-
+  /* Working w/o CamRig */
   return (
-    <group>
+    <group position={[0, 0, 0]} rotation={[-1.2, 0, 0]} scale={1.3}>
       <mesh
         castShadow
-        geometry={nodes.defaultMaterial.geometry}
-        material={materials.Hoodie}
+        geometry={objectNode.geometry}
+        material={hoodieMaterial || objectNode.material}
       >
         {snap.isFullTexture && (
           <Decal
@@ -52,6 +43,7 @@ const Shirt = () => {
             map={fullTexture}
           />
         )}
+
         {snap.isLogoTexture && (
           <Decal
             position={[0, 0.04, 0.15]}

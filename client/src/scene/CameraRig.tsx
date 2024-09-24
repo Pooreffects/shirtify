@@ -1,4 +1,4 @@
-import { useRef, ReactNode } from 'react';
+import { useRef, ReactNode, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { easing } from 'maath';
 import { useSnapshot } from 'valtio';
@@ -14,25 +14,35 @@ const CameraRig = ({ children }: ICameraRigProps) => {
   const group = useRef<THREE.Group>(null);
   const snap = useSnapshot(state);
 
-  const getTargetPosition = (): [number, number, number] => {
-    const isMobile = window.innerWidth <= 600;
-    const isBreakpoint = window.innerWidth <= 1260;
+  // Store screen width in state and update on resize
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
+  const [isBreakpoint, setIsBreakpoint] = useState(window.innerWidth <= 1460);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 600);
+      setIsBreakpoint(window.innerWidth <= 1260);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const getTargetPosition = (): [number, number, number] => {
     if (snap.intro) {
-      if (isMobile) return [0, 0.2, 2.5];
-      if (isBreakpoint) return [0, 0, 2];
+      if (isMobile) return [0, -5, 0]; // Ensure Y-axis is 0 to face the hoodie
+      if (isBreakpoint) return [0, -5, 0]; // Slightly above for larger screens
     }
-    return isMobile ? [0, 0, 2.5] : [0, 0, 2];
+    return isMobile ? [0, 0, 2.5] : [0, 0.1, 2.5]; // Keep it at eye level
   };
 
-  // Update camera position and model rotation on each frame
   useFrame((state, delta) => {
     const targetPosition = getTargetPosition();
 
-    // Smooth camera position transition
+    // Smoothly adjust the camera position
     easing.damp3(state.camera.position, targetPosition, 0.25, delta);
 
-    // Smooth model rotation based on pointer movement
+    // Smoothly rotate the model based on pointer position
     if (group.current) {
       easing.dampE(
         group.current.rotation,
