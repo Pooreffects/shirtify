@@ -17,11 +17,11 @@ const Scene: React.FC = () => {
       <Environment preset='city' />
 
       <Backdrop />
-      {/* <CameraRig> */}
-      <Center>
-        <Shirt />
-      </Center>
-      {/* </CameraRig> */}
+      <CameraRig>
+        <Center>
+          <Shirt />
+        </Center>
+      </CameraRig>
     </Canvas>
   );
 };
