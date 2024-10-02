@@ -12,8 +12,10 @@ const Shirt = () => {
 
   // Memoized node and material references
   const objectNode = useMemo(() => nodes.Object_39, [nodes]);
-  const hoodieMaterial = useMemo(
-    () => materials.Hoodie as THREE.MeshStandardMaterial,
+
+  // Target a specific material, e.g., Material5612
+  const targetMaterial = useMemo(
+    () => materials.Material5612 as THREE.MeshStandardMaterial,
     [materials]
   );
 
@@ -23,17 +25,18 @@ const Shirt = () => {
 
   // Animate material color changes based on state
   useFrame((_, delta) => {
-    if (hoodieMaterial) {
-      easing.dampC(hoodieMaterial.color, snap.color, 0.25, delta);
+    if (targetMaterial) {
+      const targetColor = new THREE.Color(snap.color); // Ensure snap.color is a valid color format
+      easing.dampC(targetMaterial.color, targetColor, 0.25, delta);
     }
   });
-  /* Working w/o CamRig */
+
   return (
     <group position={[0, 0, 0]} rotation={[-1.2, 0, 0]} scale={1.3}>
       <mesh
         castShadow
         geometry={objectNode.geometry}
-        material={hoodieMaterial || objectNode.material}
+        material={targetMaterial || objectNode.material}
       >
         {snap.isFullTexture && (
           <Decal

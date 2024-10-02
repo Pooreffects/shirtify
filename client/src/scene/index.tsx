@@ -13,7 +13,7 @@ const Scene: React.FC = () => {
       gl={{ preserveDrawingBuffer: true }}
       className='w-full max-w-full h-full transition-all ease-in'
     >
-      <ambientLight intensity={1.1} />
+      <ambientLight intensity={0.4} />
       <Environment preset='city' />
 
       <Backdrop />
