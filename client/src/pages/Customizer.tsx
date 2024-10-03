@@ -1,16 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSnapshot } from 'valtio';
-// App configuration and state
-import config from '../config/config';
-import state from '../store';
-import { download } from '../assets';
-// Helper functions for image download and file reading
+import state, { type State } from '../store';
 import { downloadCanvasToImage, reader } from '../config/helpers';
-// Constant values for tab labels and decal types
-import { EditorTabs, FilterTabs, DecalTypes } from '../config/constants';
+import {
+  EditorTabs,
+  FilterTabs,
+  DecalTypes,
+  FilterTabKey,
+  DecalTypeKey,
+} from '../config/constants';
 import { fadeAnimation, slideAnimation } from '../config/motion';
-
 import {
   Tab,
   AIPicker,
@@ -19,32 +19,70 @@ import {
   CustomButton,
 } from '../components';
 
-interface ICustomizerProps {}
-
-const Customizer: React.FC<ICustomizerProps> = () => {
+// Customizer component
+const Customizer: React.FC = () => {
   const snap = useSnapshot(state);
 
-  const [file, setFile] = useState('');
-  const [prompt, setPrompt] = useState('');
-  const [generatingImg, setGeneratingImg] = useState(false);
-
-  const [activeEditorTab, setActiveEditortab] = useState('');
-  const [activeFilterTab, setActiveFilterTab] = useState({
+  // Local state for file input and UI interactions
+  const [file, setFile] = useState<File | null>(null);
+  const [activeEditorTab, setActiveEditorTab] = useState<string>('');
+  const [activeFilterTab, setActiveFilterTab] = useState<
+    Record<FilterTabKey, boolean>
+  >({
     logoShirt: true,
     stylishShirt: false,
   });
 
-  const generateTabContent = () => {
-    switch (activeEditorTab) {
-      case 'colorpicker':
-        return <ColorPicker />;
-      case 'filepicker':
-        return <FilePicker />;
-      case 'aipicker':
-        return <AIPicker />;
-      default:
-        break;
+  // Render the active editor tab component based on selection
+  const renderActiveEditorTab = () => {
+    const editorComponents: Record<string, JSX.Element | null> = {
+      colorpicker: <ColorPicker />,
+      filepicker: (
+        <FilePicker file={file} setFile={setFile} readFile={readFile} />
+      ),
+      aipicker: <AIPicker />,
+    };
+
+    return editorComponents[activeEditorTab] || null;
+  };
+
+  // Handle decal updates based on the selected type (logo/full) and the result (image)
+  const handleDecals = (type: DecalTypeKey, result: string) => {
+    const decalType = DecalTypes[type];
+
+    if (decalType) {
+      // Directly use the state property from the decalType
+      state[decalType.stateProperty] = result; // TypeScript should infer the correct type
+
+      // Toggle the relevant filter tab
+      toggleActiveFilterTab(decalType.filterTab);
+    } else {
+      console.error(`Invalid decal type: ${type}`);
     }
+  };
+
+  // Toggle the active state of the filter tab and update the texture
+  const toggleActiveFilterTab = (tabName: FilterTabKey) => {
+    setActiveFilterTab((prev) => ({
+      ...prev,
+      [tabName]: !prev[tabName],
+    }));
+
+    // Update the texture state in valtio based on the active filter tab
+    state[tabName === 'logoShirt' ? 'isLogoTexture' : 'isFullTexture'] =
+      !activeFilterTab[tabName];
+  };
+
+  // Read the selected file and update the decal based on its type
+  const readFile = (type: DecalTypeKey) => {
+    if (!file) return;
+
+    reader(file).then((result) => {
+      if (result) {
+        handleDecals(type, result as string);
+        setActiveEditorTab(''); // Reset editor tab after reading file
+      }
+    });
   };
 
   return (
@@ -62,10 +100,10 @@ const Customizer: React.FC<ICustomizerProps> = () => {
                   <Tab
                     key={tab.name}
                     tab={tab}
-                    handleClick={() => setActiveEditortab(tab.name)}
+                    handleClick={() => setActiveEditorTab(tab.name)}
                   />
                 ))}
-                {generateTabContent()}
+                {renderActiveEditorTab()}
               </div>
             </div>
           </motion.div>
@@ -91,8 +129,10 @@ const Customizer: React.FC<ICustomizerProps> = () => {
                 key={tab.name}
                 tab={tab}
                 isFilterTab
-                isActiveTab=''
-                handleClick={() => {}}
+                isActiveTab={activeFilterTab[tab.name as FilterTabKey]}
+                handleClick={() =>
+                  toggleActiveFilterTab(tab.name as FilterTabKey)
+                }
               />
             ))}
           </motion.div>

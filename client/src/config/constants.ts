@@ -1,58 +1,36 @@
 import { swatch, fileIcon, ai, logoShirt, stylishShirt } from '../assets/';
 
-// Define types for EditorTab and FilterTab
+// Define types for EditorTab
 interface EditorTab {
   name: string;
-  icon: string; // Adjust the type based on the actual type of the icons
+  icon: string; // Adjust this type based on your actual icon type (e.g., string or JSX.Element)
 }
 
-interface FilterTab {
-  name: string;
-  icon: string; // Adjust the type based on the actual type of the icons
-}
+// Define a union type for FilterTabKey and DecalTypeKey to restrict possible values
+export type FilterTabKey = 'logoShirt' | 'stylishShirt';
+export type DecalTypeKey = 'logo' | 'full';
 
-// Define types for DecalType
-interface DecalType {
-  stateProperty: string;
-  filterTab: string;
-}
-
-// Define the EditorTabs array
+// Define the EditorTabs array with type safety
 export const EditorTabs: EditorTab[] = [
-  {
-    name: 'colorpicker',
-    icon: swatch,
-  },
-  {
-    name: 'filepicker',
-    icon: fileIcon,
-  },
-  {
-    name: 'aipicker',
-    icon: ai,
-  },
+  { name: 'colorpicker', icon: swatch },
+  { name: 'filepicker', icon: fileIcon },
+  { name: 'aipicker', icon: ai },
 ];
 
-// Define the FilterTabs array
-export const FilterTabs: FilterTab[] = [
-  {
-    name: 'logoShirt',
-    icon: logoShirt,
-  },
-  {
-    name: 'stylishShirt',
-    icon: stylishShirt,
-  },
-];
+// Define the FilterTabs array with type safety
+export const FilterTabs = [
+  { name: 'logoShirt', icon: logoShirt },
+  { name: 'stylishShirt', icon: stylishShirt },
+] as const; // Using 'as const' to infer literal types for FilterTabs
 
-// Define the DecalTypes object
-export const DecalTypes: Record<string, DecalType> = {
-  logo: {
-    stateProperty: 'logoDecal',
-    filterTab: 'logoShirt',
-  },
+// Define the DecalTypes for managing decal states and filter tabs
+export const DecalTypes = {
+  logo: { stateProperty: 'logoDecal', filterTab: 'logoShirt' as FilterTabKey },
   full: {
     stateProperty: 'fullDecal',
-    filterTab: 'stylishShirt',
+    filterTab: 'stylishShirt' as FilterTabKey,
   },
-};
+} as const; // Using 'as const' to infer literal types for DecalTypes
+
+// Define the types based on the keys of the DecalTypes
+export type DecalType = (typeof DecalTypes)[DecalTypeKey]; // Defines the structure for DecalType

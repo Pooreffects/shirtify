@@ -6,6 +6,7 @@ interface IButtonProps {
 }
 import { useSnapshot } from 'valtio';
 import state from '../store';
+import { getContrastingColor } from '../config/helpers';
 
 export default function CustomButton({
   title,
@@ -20,13 +21,13 @@ export default function CustomButton({
       case 'filled':
         return {
           backgroundColor: snap.color,
-          color: '#fff',
+          color: getContrastingColor(snap.color),
         };
       case 'outlined':
         return {
-          backgroundColor: 'transparent',
-          color: '#000',
-          border: '1px solid #000',
+          borderWidth: '1px',
+          borderColor: snap.color,
+          color: snap.color,
         };
       default:
         return {};
