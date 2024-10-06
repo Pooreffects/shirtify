@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSnapshot } from 'valtio';
-import state, { type State } from '../store';
+import state from '../store';
 import { downloadCanvasToImage, reader } from '../config/helpers';
 import {
   EditorTabs,

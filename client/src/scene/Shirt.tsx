@@ -23,10 +23,9 @@ const Shirt = () => {
   const logoTexture = useTexture(snap.logoDecal);
   const fullTexture = useTexture(snap.fullDecal);
 
-  // Animate material color changes based on state
   useFrame((_, delta) => {
     if (targetMaterial) {
-      const targetColor = new THREE.Color(snap.color); // Ensure snap.color is a valid color format
+      const targetColor = new THREE.Color(snap.color);
       easing.dampC(targetMaterial.color, targetColor, 0.25, delta);
     }
   });
@@ -40,20 +39,20 @@ const Shirt = () => {
       >
         {snap.isFullTexture && (
           <Decal
+            debug
             position={[0, 0, 0]}
             rotation={[0, 0, 0]}
-            scale={1}
+            scale={0.7}
             map={fullTexture}
           />
         )}
 
-        {snap.isLogoTexture && (
+        {snap.isLogoTexture && logoTexture && (
           <Decal
-            position={[0, 0.04, 0.15]}
+            position={[-0.02, -0.17, 0]}
             rotation={[0, 0, 0]}
-            scale={0.15}
+            scale={[0.25, 0.1, 0.4]}
             map={logoTexture}
-            depthTest={false}
           />
         )}
       </mesh>

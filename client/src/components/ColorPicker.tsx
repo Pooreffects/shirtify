@@ -1,20 +1,20 @@
-import { SketchPicker } from 'react-color';
+import { SketchPicker, ColorResult } from 'react-color'; // Import ColorResult
 import { useSnapshot } from 'valtio';
 import state from '../store';
 
-interface IColorPickerProps {}
-
-const ColorPicker = (props: IColorPickerProps) => {
-  const snap = useSnapshot(state)
+const ColorPicker = () => {
+  const snap = useSnapshot(state);
   return (
     <div className='absolute left-full ml-3'>
       <SketchPicker
-      color={snap.color}
-      disableAlpha
-      onChange={(color) => state.color = color.hex}
+        color={snap.color}
+        disableAlpha
+        onChange={(color: ColorResult) => {
+          state.color = color.hex;
+        }}
       />
     </div>
-  )
+  );
 };
 
 export default ColorPicker;
