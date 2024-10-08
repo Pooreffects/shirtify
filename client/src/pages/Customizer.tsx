@@ -42,7 +42,9 @@ const Customizer: React.FC = () => {
       ),
       aipicker: <AIPicker />,
     };
-
+/* prompt={prompt}
+          setPrompt={setPrompt}
+          generatingImg={generatingImg} */
     return editorComponents[activeEditorTab] || null;
   };
 
